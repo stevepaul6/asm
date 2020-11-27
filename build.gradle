@@ -1,0 +1,25 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.10' apply false
+}
+
+apply from: 'dependencies.gradle'
+
+wrapper {
+    gradleVersion = '6.7.1'
+}
+
+allprojects {
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven { url "https://maven.spectralpowered.org/" }
+    }
+
+    dependencies {
+        implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    }
+}
+
