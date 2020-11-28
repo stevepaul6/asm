@@ -19,6 +19,8 @@
 package org.spectral.asm.core
 
 import org.objectweb.asm.ClassReader
+import java.io.File
+import java.util.jar.JarFile
 
 /**
  * Represents a collection of ASM class files.
@@ -73,4 +75,47 @@ class ClassPool {
         return classStore[name]
     }
 
+    fun first(predicate: (Class) -> Boolean): Class {
+        classStore.values.forEach {
+            if(predicate(it)) {
+                return it
+            }
+        }
+
+        throw IllegalStateException("No matching predicate found.")
+    }
+
+    fun firstOrNull(predicate: (Class) -> Boolean): Class? {
+        classStore.values.forEach {
+            if(predicate(it)) {
+                return it
+            }
+        }
+
+        return null
+    }
+
+    companion object {
+
+        /**
+         * Creates a class pool from a Jar file.
+         *
+         * @param jar File
+         * @return ClassPool
+         */
+        fun readJar(jar: File): ClassPool {
+            val pool = ClassPool()
+
+            JarFile(jar).use { entry ->
+                entry.entries().asSequence()
+                    .filter { it.name.endsWith(".class") }
+                    .forEach {
+                        val bytes = entry.getInputStream(it).readAllBytes()
+                        pool.addClass(bytes)
+                    }
+            }
+
+            return pool
+        }
+    }
 }
