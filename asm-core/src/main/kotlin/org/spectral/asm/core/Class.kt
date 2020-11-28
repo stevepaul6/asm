@@ -38,6 +38,10 @@ class Class(val pool: ClassPool) : ClassVisitor(ASM9) {
 
     val interfaceNames = mutableListOf<String>()
 
+    val parent: Class? get() {
+        return pool[superName]
+    }
+
     override fun visit(
         version: Int,
         access: Int,

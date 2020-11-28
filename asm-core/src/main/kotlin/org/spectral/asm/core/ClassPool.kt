@@ -69,4 +69,8 @@ class ClassPool {
         classStore.values.forEach { action(it) }
     }
 
+    operator fun get(name: String): Class? {
+        return classStore[name]
+    }
+
 }
