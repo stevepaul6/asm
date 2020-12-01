@@ -19,39 +19,37 @@
 package org.spectral.asm.core
 
 import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.MethodNode
 
 /**
- * Backing storage of class pools objects associated with class nodes.
+ * The backing storage of [MethodNode] owner [ClassNode] objects.
  */
-private val classNodePools = hashMapOf<ClassNode, ClassPool>()
+private val methodOwnerClasses = hashMapOf<MethodNode, ClassNode>()
 
 /**
- * Initialize and store the pool for each class file.
+ * Initialize a method node with its class node owner.
  *
- * @receiver ClassNode
- * @param pool ClassPool
+ * @receiver MethodNode
+ * @param owner ClassNode
  */
-internal fun ClassNode.init(pool: ClassPool) {
-    classNodePools[this] = pool
+internal fun MethodNode.init(owner: ClassNode) {
+   methodOwnerClasses[this] = owner
+}
 
-    /*
-     * Initialize class node methods
-     */
-    this.methods.forEach {
-        it.init(this)
-    }
+val MethodNode.owner: ClassNode get() {
+    return methodOwnerClasses[this] ?: throw NoSuchElementException("No owner class found for method: '${this.name}${this.desc}'.")
 }
 
 /**
- * The pool the given [ClassNode] belongs inside of.
+ * Gets the [ClassPool] the method's owner belongs in.
  */
-val ClassNode.pool: ClassPool get() {
-    return classNodePools[this] ?: throw NoSuchElementException("No pool entry for class: '${this.name}'.")
+val MethodNode.pool: ClassPool get() {
+    return this.owner.pool
 }
 
 /**
- * Gets the string representation of this [ClassNode].
+ * Gets the string representation of this [MethodNode]
  */
-val ClassNode.string: String get() {
-    return this.name
+val MethodNode.string: String get() {
+    return "${this.owner.string}.${this.name}${this.desc}"
 }
