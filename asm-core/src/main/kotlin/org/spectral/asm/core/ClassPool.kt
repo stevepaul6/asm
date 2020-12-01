@@ -19,154 +19,53 @@
 package org.spectral.asm.core
 
 import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.tree.ClassNode
 import java.io.File
-import java.io.FileOutputStream
-import java.util.jar.JarEntry
 import java.util.jar.JarFile
-import java.util.jar.JarOutputStream
 
 /**
- * Represents a collection of ASM [ClassNode]s from a common classpath source.
+ * Represents a collection of JVM class objects from a common classpath.
  */
 class ClassPool {
 
     /**
-     * The backing storage map of [ClassNode] object keyed by the class name.
+     * The backing store of classes mapped to their class name.
      */
-    private val classStore = hashMapOf<String, ClassNode>()
+    private val classStore = mutableMapOf<String, Class>()
 
-    /**
-     * Gets a immutable list of [ClassNode]s in the pool.
-     */
-    val classes: List<ClassNode> get() {
+    val classes: List<Class> get() {
         return classStore.values.toList()
     }
 
-    /**
-     * Adds a class entry to the pool.
-     *
-     * @param entry ClassNode
-     * @return Boolean
-     */
-    fun addClass(entry: ClassNode): Boolean {
-       if(classStore.containsKey(entry.name)) {
-           return false
-       }
-
-        classStore[entry.name] = entry
-        entry.init(this)
-
-        return true
-    }
+    val size: Int get() = classStore.size
 
     /**
-     * Removes a class from the pool with a given name.
+     * Adds a class to the pool.
      *
-     * @param name String
-     * @return Boolean
+     * @param clazz Class
      */
-    fun removeClass(name: String): Boolean {
-        if(!classStore.containsKey(name)) {
-            return false
+    fun addClass(clazz: Class) {
+        if(classStore.containsKey(clazz.name)) {
+           throw IllegalStateException("Class with name ${clazz.name} already exists in the pool.")
         }
 
-        classStore.remove(name)
-        return true
+        classStore[clazz.name] = clazz
     }
 
-    /**
-     * Adds a class node from the raw bytecode of a class file.
-     *
-     * @param bytes ByteArray
-     * @return Boolean
-     */
-    fun addClass(bytes: ByteArray): Boolean {
-        val node = ClassNode()
+    fun addClass(bytes: ByteArray) {
+        val node = Class(this)
         val reader = ClassReader(bytes)
 
         reader.accept(node, ClassReader.SKIP_FRAMES)
 
-        return this.addClass(node)
-    }
-
-    /**
-     * Gets a [ClassNode] with the class name of the provided [name] field.
-     *
-     * @param name String
-     * @return ClassNode?
-     */
-    operator fun get(name: String): ClassNode? {
-        return classStore[name]
-    }
-
-    /**
-     * Perform an [action] for each value in pool.
-     *
-     * @param action Function1<ClassNode, Unit>
-     */
-    fun forEach(action: (ClassNode) -> Unit) {
-        return classStore.values.forEach(action)
-    }
-
-    /**
-     * Gets the first [ClassNode] in the pool where the provided [predicate] returns true.
-     *
-     * @param predicate Function1<ClassNode, Boolean>
-     * @return ClassNode?
-     */
-    fun firstOrNull(predicate: (ClassNode) -> Boolean): ClassNode? {
-       return classStore.values.firstOrNull(predicate)
-    }
-
-    /**
-     * Gets the first [ClassNode] in the pool where the provided [predicate] returns true.
-     *
-     * @param predicate Function1<ClassNode, Boolean>
-     * @return ClassNode
-     */
-    fun first(predicate: (ClassNode) -> Boolean): ClassNode {
-       return classStore.values.first(predicate)
-    }
-
-    /**
-     * Returns the list of [ClassNode]s in the pool filtered by a provided [predicate].
-     *
-     * @param predicate Function1<ClassNode, Boolean>
-     * @return List<ClassNode>
-     */
-    fun filter(predicate: (ClassNode) -> Boolean): List<ClassNode> {
-        return classStore.values.filter(predicate)
-    }
-
-    /**
-     * Writes all the [ClassNode]s in the pool to a Jar file.
-     *
-     * @param jarFile File
-     */
-    fun writeJar(jarFile: File) {
-       val jos = JarOutputStream(FileOutputStream(jarFile))
-
-        this.forEach { node ->
-            val entry = JarEntry(node.name + ".class")
-            val writer = ClassWriter(ClassWriter.COMPUTE_MAXS)
-
-            node.accept(writer)
-            jos.putNextEntry(entry)
-            jos.write(writer.toByteArray())
-            jos.closeEntry()
-        }
-
-        jos.close()
+        this.addClass(node)
     }
 
     companion object {
 
         /**
-         * Creates a [ClassPool] from reading the class files inside of a jar file.
+         * Creates a [ClassPool] with all entries in a jar file.
          *
-         * @param jarFile [ERROR : File]
+         * @param jarFile File
          * @return ClassPool
          */
         fun readJar(jarFile: File): ClassPool {
@@ -176,7 +75,8 @@ class ClassPool {
                 jar.entries().asSequence()
                     .filter { it.name.endsWith(".class") }
                     .forEach {
-                        pool.addClass(jar.getInputStream(it).readAllBytes())
+                        val bytes = jar.getInputStream(it).readAllBytes()
+                        pool.addClass(bytes)
                     }
             }
 
