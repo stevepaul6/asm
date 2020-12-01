@@ -20,6 +20,8 @@ package org.spectral.asm.core
 
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.tree.ClassNode
+import java.io.File
+import java.util.jar.JarFile
 
 /**
  * Represents a collection of ASM [ClassNode]s from a common classpath source.
@@ -50,6 +52,8 @@ class ClassPool {
        }
 
         classStore[entry.name] = entry
+        entry.init(this)
+
         return true
     }
 
@@ -130,5 +134,28 @@ class ClassPool {
      */
     fun filter(predicate: (ClassNode) -> Boolean): List<ClassNode> {
         return classStore.values.filter(predicate)
+    }
+
+    companion object {
+
+        /**
+         * Creates a [ClassPool] from reading the class files inside of a jar file.
+         *
+         * @param jarFile [ERROR : File]
+         * @return ClassPool
+         */
+        fun readJar(jarFile: File): ClassPool {
+            val pool = ClassPool()
+
+            JarFile(jarFile).use { jar ->
+                jar.entries().asSequence()
+                    .filter { it.name.endsWith(".class") }
+                    .forEach {
+                        pool.addClass(jar.getInputStream(it).readAllBytes())
+                    }
+            }
+
+            return pool
+        }
     }
 }
