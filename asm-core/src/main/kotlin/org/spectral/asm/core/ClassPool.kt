@@ -19,7 +19,6 @@
 package org.spectral.asm.core
 
 import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassWriter
 import java.io.File
 import java.io.FileOutputStream
 import java.util.jar.JarEntry

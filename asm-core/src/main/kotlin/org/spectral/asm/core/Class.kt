@@ -20,6 +20,7 @@ package org.spectral.asm.core
 
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.util.CheckClassAdapter
 import org.spectral.asm.core.util.Bytecode
@@ -49,6 +50,8 @@ class Class(val pool: ClassPool) : ClassVisitor(ASM9) {
         return pool.findClass(superName)
     }
 
+    val methods = mutableMapOf<String, Method>()
+
     val isInterface: Boolean get() = (this.access and ACC_INTERFACE) != 0
 
     val isAbstract: Boolean get() = (this.access and ACC_ABSTRACT) != 0
@@ -74,6 +77,26 @@ class Class(val pool: ClassPool) : ClassVisitor(ASM9) {
         this.source = source
     }
 
+    override fun visitMethod(
+        access: Int,
+        name: String,
+        desc: String,
+        signature: String?,
+        exceptions: Array<out String>
+    ): MethodVisitor {
+        return Method(this, access, name, desc)
+    }
+
+    override fun visitEnd() {
+        /*
+         * Nothing to do
+         */
+    }
+
+    fun accept(visitor: ClassVisitor) {
+
+    }
+
     /**
      * Gets the raw bytecode of the class object.
      *
@@ -93,10 +116,6 @@ class Class(val pool: ClassPool) : ClassVisitor(ASM9) {
         Bytecode.validate(name, data)
 
         return data
-    }
-
-    fun accept(visitor: ClassVisitor) {
-
     }
 
     override fun toString(): String {
