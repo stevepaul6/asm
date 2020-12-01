@@ -35,9 +35,12 @@ class Method(
     val owner: Class,
     var access: Int,
     var name: String,
-    var desc: String
+    var desc: Descriptor
 ) : MethodVisitor(ASM9) {
 
+    /**
+     * The pool this method's owning class belongs in.
+     */
     val pool: ClassPool = owner.pool
 
     override fun visitEnd() {

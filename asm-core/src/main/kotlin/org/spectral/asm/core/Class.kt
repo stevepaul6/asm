@@ -84,7 +84,7 @@ class Class(val pool: ClassPool) : ClassVisitor(ASM9) {
         signature: String?,
         exceptions: Array<out String>?
     ): MethodVisitor {
-        return Method(this, access, name, desc)
+        return Method(this, access, name, Descriptor(desc))
     }
 
     override fun visitEnd() {
