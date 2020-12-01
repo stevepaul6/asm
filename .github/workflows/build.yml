@@ -1,0 +1,31 @@
+name: build
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: gradlew execute update
+        run: chmod +x ./gradlew
+      - name: JDK 14 Setup
+        uses: actions/setup-java@v1
+        with:
+          java-version: 14
+      - name: Build
+        run: ./gradlew build -x test
+      - uses: sarisia/actions-status-discord@v1
+        if: always()
+        with:
+          webhook: ${{ secrets.DISCORD_ACTIONS_WEBHOOK }}
+          status: ${{ job.status }}
+          title: "build"
+          username: Spectral
+          avatar_url: ${{ secrets.DISCORD_AVATAR_URL }}
