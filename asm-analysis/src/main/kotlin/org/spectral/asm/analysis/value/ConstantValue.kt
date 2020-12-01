@@ -20,19 +20,28 @@ package org.spectral.asm.analysis.value
 
 import org.objectweb.asm.tree.analysis.BasicValue
 import org.objectweb.asm.tree.analysis.Value
+import org.spectral.asm.analysis.util.Casts
 
 /**
  * Represents a constant known value at compile-time which is pushed
  * or popped as an operand of the JVM stack.
- *
- * @property type The primitive type of this constant.
- * @property value The data value of this constant.
- * @constructor
  */
-class ConstantValue(private val type: BasicValue, val value: Any) : Value {
+class ConstantValue(private val type: BasicValue, value: Any) : Value {
 
+    /**
+     * The data value of this constant.
+     */
+    val value: Any
+
+    /**
+     * Initialize and format JVM stack types of the constant primitives.
+     */
     init {
-
+        if(type == BasicValue.INT_VALUE && value !is Int) {
+            this.value = Casts.castToPrimitive<Int>(value)
+        } else {
+            this.value = value
+        }
     }
 
     /**
