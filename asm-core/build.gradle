@@ -1,3 +1,25 @@
-dependencies {
+plugins {
+    id 'maven-publish'
+}
 
+publishing {
+    repositories {
+        mavenLocal()
+        maven {
+            url "https://maven.spectralpowered.org/"
+            credentials {
+                username System.getenv("MAVEN_USER")
+                password System.getenv("MAVEN_TOKEN")
+            }
+        }
+    }
+
+    publications {
+        maven(MavenPublication) {
+            groupId = 'org.spectral'
+            artifactId ='asm-core'
+            version = project.version
+            from components.java
+        }
+    }
 }
