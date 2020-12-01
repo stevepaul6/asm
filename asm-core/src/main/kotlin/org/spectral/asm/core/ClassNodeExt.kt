@@ -40,6 +40,13 @@ internal fun ClassNode.init(pool: ClassPool) {
     this.methods.forEach {
         it.init(this)
     }
+
+    /*
+     * Initialize the class node fields
+     */
+    this.fields.forEach {
+        it.init(this)
+    }
 }
 
 /**
