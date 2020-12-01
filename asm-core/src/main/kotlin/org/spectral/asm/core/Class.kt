@@ -82,7 +82,7 @@ class Class(val pool: ClassPool) : ClassVisitor(ASM9) {
         name: String,
         desc: String,
         signature: String?,
-        exceptions: Array<out String>
+        exceptions: Array<out String>?
     ): MethodVisitor {
         return Method(this, access, name, desc)
     }

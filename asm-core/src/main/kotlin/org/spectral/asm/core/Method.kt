@@ -44,7 +44,7 @@ class Method(
         /*
          * Add this method to the owner's method list.
          */
-        owner.methods[desc] = this
+        owner.methods[this.toString()] = this
     }
 
     override fun toString(): String {
