@@ -19,8 +19,12 @@
 package org.spectral.asm.core
 
 import org.objectweb.asm.ClassReader
+import org.objectweb.asm.ClassWriter
 import java.io.File
+import java.io.FileOutputStream
+import java.util.jar.JarEntry
 import java.util.jar.JarFile
+import java.util.jar.JarOutputStream
 
 /**
  * Represents a collection of JVM class objects from a common classpath.
@@ -58,6 +62,56 @@ class ClassPool {
         reader.accept(node, ClassReader.SKIP_FRAMES)
 
         this.addClass(node)
+    }
+
+    /**
+     * Removes the provided class from the pool.
+     *
+     * @param clazz Class
+     */
+    fun removeClass(clazz: Class) {
+       if(!classStore.containsKey(clazz.name)) {
+           throw NoSuchElementException("No class with name ${clazz.name} found in the pool.")
+       }
+
+       classStore.remove(clazz.name)
+    }
+
+    fun findClass(name: String): Class? {
+        return classStore[name]
+    }
+
+    fun first(predicate: (Class) -> Boolean): Class {
+        return classStore.values.first(predicate)
+    }
+
+    fun firstOrNull(predicate: (Class) -> Boolean): Class? {
+        return classStore.values.firstOrNull(predicate)
+    }
+
+    fun forEach(action: (Class) -> Unit) {
+        classStore.values.forEach(action)
+    }
+
+    fun filter(predicate: (Class) -> Boolean): List<Class> {
+        return classStore.values.filter(predicate)
+    }
+
+    /**
+     * Writes the current [Class]'s in the pool to a jar file.
+     *
+     * @param jarFile File
+     */
+    fun writeJar(jarFile: File) {
+       val jos = JarOutputStream(FileOutputStream(jarFile))
+
+       this.forEach { entry ->
+           jos.putNextEntry(JarEntry(entry.name + ".class"))
+           jos.write(entry.toBytecode())
+           jos.closeEntry()
+       }
+
+        jos.close()
     }
 
     companion object {

@@ -19,7 +19,11 @@
 package org.spectral.asm.core
 
 import org.objectweb.asm.ClassVisitor
-import org.objectweb.asm.Opcodes.ASM9
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.Opcodes.*
+import org.objectweb.asm.util.CheckClassAdapter
+import org.spectral.asm.core.util.Bytecode
+import org.spectral.asm.core.util.NonLoadingClassWriter
 
 /**
  * Represents a JVM class.
@@ -41,6 +45,16 @@ class Class(val pool: ClassPool) : ClassVisitor(ASM9) {
 
     val interfaceNames = mutableListOf<String>()
 
+    val parent: Class? get() {
+        return pool.findClass(superName)
+    }
+
+    val isInterface: Boolean get() = (this.access and ACC_INTERFACE) != 0
+
+    val isAbstract: Boolean get() = (this.access and ACC_ABSTRACT) != 0
+
+    val isFinal: Boolean get() = (this.access and ACC_FINAL) != 0
+
     override fun visit(
         version: Int,
         access: Int,
@@ -58,6 +72,31 @@ class Class(val pool: ClassPool) : ClassVisitor(ASM9) {
 
     override fun visitSource(source: String, debug: String?) {
         this.source = source
+    }
+
+    /**
+     * Gets the raw bytecode of the class object.
+     *
+     * @return ByteArray
+     */
+    fun toBytecode(): ByteArray {
+        val writer = NonLoadingClassWriter(pool, ClassWriter.COMPUTE_FRAMES or ClassWriter.COMPUTE_MAXS)
+        val checkAdapter = CheckClassAdapter(writer, false)
+
+        this.accept(checkAdapter)
+
+        val data = writer.toByteArray()
+
+        /*
+         * Validate the data flow graph of the resulting bytecode.
+         */
+        Bytecode.validate(name, data)
+
+        return data
+    }
+
+    fun accept(visitor: ClassVisitor) {
+
     }
 
     override fun toString(): String {
