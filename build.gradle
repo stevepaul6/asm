@@ -21,9 +21,10 @@ allprojects {
 
     dependencies {
         implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-        implementation "org.ow2.asm:asm:$asm"
-        implementation "org.ow2.asm:asm-commons:$asm"
-        implementation "org.ow2.asm:asm-util:$asm"
+        api "org.ow2.asm:asm:$asm"
+        api "org.ow2.asm:asm-commons:$asm"
+        api "org.ow2.asm:asm-util:$asm"
+        api "org.ow2.asm:asm-tree:$asm"
     }
 
     sourceSets {

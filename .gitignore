@@ -4,4 +4,5 @@ build/
 out/
 *.log
 *.jar
-!gradle
+!gradle-wrapper.jar
+Test.kt

@@ -19,103 +19,116 @@
 package org.spectral.asm.core
 
 import org.objectweb.asm.ClassReader
-import java.io.File
-import java.util.jar.JarFile
+import org.objectweb.asm.tree.ClassNode
 
 /**
- * Represents a collection of ASM class files.
+ * Represents a collection of ASM [ClassNode]s from a common classpath source.
  */
 class ClassPool {
 
     /**
-     * A backing map storage of classes to their name.
+     * The backing storage map of [ClassNode] object keyed by the class name.
      */
-    private val classStore = hashMapOf<String, Class>()
+    private val classStore = hashMapOf<String, ClassNode>()
 
-    fun contains(entry: Class): Boolean {
-        return classStore.values.contains(entry)
+    /**
+     * Gets a immutable list of [ClassNode]s in the pool.
+     */
+    val entries: List<ClassNode> get() {
+        return classStore.values.toList()
     }
 
-    fun contains(name: String): Boolean {
-        return classStore.containsKey(name)
-    }
-
-    fun addClass(entry: Class): Boolean {
-        if(this.contains(entry.name)) {
-            return false
-        }
+    /**
+     * Adds a class entry to the pool.
+     *
+     * @param entry ClassNode
+     * @return Boolean
+     */
+    fun addClass(entry: ClassNode): Boolean {
+       if(classStore.containsKey(entry.name)) {
+           return false
+       }
 
         classStore[entry.name] = entry
         return true
     }
 
-    fun addClass(bytecode: ByteArray): Boolean {
-        val entry = Class(this)
-
-        val reader = ClassReader(bytecode)
-        reader.accept(entry, ClassReader.SKIP_FRAMES)
-
-        return this.addClass(entry)
-    }
-
-    fun removeClass(entry: Class): Boolean {
-        if(!this.contains(entry.name)) {
+    /**
+     * Removes a class from the pool with a given name.
+     *
+     * @param name String
+     * @return Boolean
+     */
+    fun removeClass(name: String): Boolean {
+        if(!classStore.containsKey(name)) {
             return false
         }
 
-        classStore.remove(entry.name)
+        classStore.remove(name)
         return true
     }
 
-    fun forEach(action: (Class) -> Unit) {
-        classStore.values.forEach { action(it) }
+    /**
+     * Adds a class node from the raw bytecode of a class file.
+     *
+     * @param bytes ByteArray
+     * @return Boolean
+     */
+    fun addClass(bytes: ByteArray): Boolean {
+        val node = ClassNode()
+        val reader = ClassReader(bytes)
+
+        reader.accept(node, ClassReader.SKIP_FRAMES)
+
+        return this.addClass(node)
     }
 
-    operator fun get(name: String): Class? {
+    /**
+     * Gets a [ClassNode] with the class name of the provided [name] field.
+     *
+     * @param name String
+     * @return ClassNode?
+     */
+    operator fun get(name: String): ClassNode? {
         return classStore[name]
     }
 
-    fun first(predicate: (Class) -> Boolean): Class {
-        classStore.values.forEach {
-            if(predicate(it)) {
-                return it
-            }
-        }
-
-        throw IllegalStateException("No matching predicate found.")
+    /**
+     * Perform an [action] for each value in pool.
+     *
+     * @param action Function1<ClassNode, Unit>
+     */
+    fun forEach(action: (ClassNode) -> Unit) {
+        return classStore.values.forEach(action)
     }
 
-    fun firstOrNull(predicate: (Class) -> Boolean): Class? {
-        classStore.values.forEach {
-            if(predicate(it)) {
-                return it
-            }
-        }
-
-        return null
+    /**
+     * Gets the first [ClassNode] in the pool where the provided [predicate] returns true.
+     *
+     * @param predicate Function1<ClassNode, Boolean>
+     * @return ClassNode?
+     */
+    fun firstOrNull(predicate: (ClassNode) -> Boolean): ClassNode? {
+       return classStore.values.firstOrNull(predicate)
     }
 
-    companion object {
+    /**
+     * Gets the first [ClassNode] in the pool where the provided [predicate] returns true.
+     *
+     * @param predicate Function1<ClassNode, Boolean>
+     * @return ClassNode
+     */
+    fun first(predicate: (ClassNode) -> Boolean): ClassNode {
+       return classStore.values.first(predicate)
+    }
 
-        /**
-         * Creates a class pool from a Jar file.
-         *
-         * @param jar File
-         * @return ClassPool
-         */
-        fun readJar(jar: File): ClassPool {
-            val pool = ClassPool()
-
-            JarFile(jar).use { entry ->
-                entry.entries().asSequence()
-                    .filter { it.name.endsWith(".class") }
-                    .forEach {
-                        val bytes = entry.getInputStream(it).readAllBytes()
-                        pool.addClass(bytes)
-                    }
-            }
-
-            return pool
-        }
+    /**
+     * Returns the list of [ClassNode]s in the pool filtered by a provided [predicate].
+     *
+     * @param predicate Function1<ClassNode, Boolean>
+     * @return List<ClassNode>
+     */
+    fun filter(predicate: (ClassNode) -> Boolean): List<ClassNode> {
+        return classStore.values.filter(predicate)
     }
 }
