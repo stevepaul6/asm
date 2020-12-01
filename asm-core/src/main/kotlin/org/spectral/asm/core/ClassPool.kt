@@ -36,7 +36,7 @@ class ClassPool {
     /**
      * Gets a immutable list of [ClassNode]s in the pool.
      */
-    val entries: List<ClassNode> get() {
+    val classes: List<ClassNode> get() {
         return classStore.values.toList()
     }
 
