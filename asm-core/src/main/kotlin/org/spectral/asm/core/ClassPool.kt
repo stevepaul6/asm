@@ -19,9 +19,13 @@
 package org.spectral.asm.core
 
 import org.objectweb.asm.ClassReader
+import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.tree.ClassNode
 import java.io.File
+import java.io.FileOutputStream
+import java.util.jar.JarEntry
 import java.util.jar.JarFile
+import java.util.jar.JarOutputStream
 
 /**
  * Represents a collection of ASM [ClassNode]s from a common classpath source.
@@ -134,6 +138,27 @@ class ClassPool {
      */
     fun filter(predicate: (ClassNode) -> Boolean): List<ClassNode> {
         return classStore.values.filter(predicate)
+    }
+
+    /**
+     * Writes all the [ClassNode]s in the pool to a Jar file.
+     *
+     * @param jarFile File
+     */
+    fun writeJar(jarFile: File) {
+       val jos = JarOutputStream(FileOutputStream(jarFile))
+
+        this.forEach { node ->
+            val entry = JarEntry(node.name + ".class")
+            val writer = ClassWriter(ClassWriter.COMPUTE_MAXS)
+
+            node.accept(writer)
+            jos.putNextEntry(entry)
+            jos.write(writer.toByteArray())
+            jos.closeEntry()
+        }
+
+        jos.close()
     }
 
     companion object {
