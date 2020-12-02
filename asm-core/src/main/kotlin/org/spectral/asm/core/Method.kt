@@ -20,6 +20,7 @@ package org.spectral.asm.core
 
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.ASM9
+import org.spectral.asm.core.code.Code
 
 /**
  * Represents a method which is owned by a JVM class.
@@ -42,6 +43,16 @@ class Method(
      * The pool this method's owning class belongs in.
      */
     val pool: ClassPool = owner.pool
+
+    /**
+     * The code object of this method.
+     */
+    val code = Code(this)
+
+    override fun visitMaxs(maxStack: Int, maxLocals: Int) {
+        code.maxStack = maxStack
+        code.maxLocals = maxLocals
+    }
 
     override fun visitEnd() {
         /*

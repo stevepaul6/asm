@@ -16,40 +16,47 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.spectral.asm.core
+package org.spectral.asm.core.code
 
-import org.objectweb.asm.FieldVisitor
-import org.objectweb.asm.Opcodes.ASM9
-import org.objectweb.asm.Type
+import org.objectweb.asm.MethodVisitor
+import org.objectweb.asm.util.Printer
 
-class Field(
-    val owner: Class,
-    var access: Int,
-    var name: String,
-    var type: Type,
-    var value: Any?
-) : FieldVisitor(ASM9) {
-
-    /**
-     * The [ClassPool] this field's owner belongs in.
-     */
-    val pool: ClassPool = owner.pool
+/**
+ * Represents a JVM opcode instruction./
+ *
+ * @property opcode Int
+ * @property index Int
+ * @constructor
+ */
+abstract class Instruction(val opcode: Int) {
 
     /**
-     * Gets the string descriptor of this field's type.
+     * The instruction index
      */
-    val desc: String get() {
-        return type.descriptor
-    }
+    var index: Int = -1
 
-    override fun visitEnd() {
-        /*
-         * Add this field to the owner's field map
-         */
-        owner.fields[this.toString()] = this
-    }
+    /**
+     * The next instruction
+     */
+    lateinit var nextInsn: Instruction
+
+    /**
+     * The previous instruction
+     */
+    lateinit var prevInsn: Instruction
+
+    /**
+     * Makes a provided visitor visit this instruction.
+     *
+     * @param visitor MethodVisitor
+     */
+    abstract fun accept(visitor: MethodVisitor)
 
     override fun toString(): String {
-        return "$owner.$name"
+        return if(opcode == -1) {
+            "INSN"
+        } else {
+            Printer.OPCODES[opcode]
+        }
     }
 }

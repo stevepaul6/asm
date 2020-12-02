@@ -35,10 +35,16 @@ class ClassPool {
      */
     private val classStore = mutableMapOf<String, Class>()
 
+    /**
+     * The classes in the class pool.
+     */
     val classes: List<Class> get() {
         return classStore.values.toList()
     }
 
+    /**
+     * The number of classes in the pool
+     */
     val size: Int get() = classStore.size
 
     /**

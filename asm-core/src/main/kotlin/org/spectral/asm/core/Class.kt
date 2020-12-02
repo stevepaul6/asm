@@ -18,9 +18,7 @@
 
 package org.spectral.asm.core
 
-import org.objectweb.asm.ClassVisitor
-import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.MethodVisitor
+import org.objectweb.asm.*
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.util.CheckClassAdapter
 import org.spectral.asm.core.util.Bytecode
@@ -51,6 +49,8 @@ class Class(val pool: ClassPool) : ClassVisitor(ASM9) {
     }
 
     val methods = mutableMapOf<String, Method>()
+
+    val fields = mutableMapOf<String, Field>()
 
     val isInterface: Boolean get() = (this.access and ACC_INTERFACE) != 0
 
@@ -85,6 +85,16 @@ class Class(val pool: ClassPool) : ClassVisitor(ASM9) {
         exceptions: Array<out String>?
     ): MethodVisitor {
         return Method(this, access, name, Descriptor(desc))
+    }
+
+    override fun visitField(
+        access: Int,
+        name: String,
+        desc: String,
+        signature: String?,
+        value: Any?
+    ): FieldVisitor {
+        return Field(this, access, name, Type.getType(desc), value)
     }
 
     override fun visitEnd() {
