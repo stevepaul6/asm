@@ -1,5 +1,6 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.4.10' apply false
+    id 'idea'
 }
 
 apply from: 'dependencies.gradle'
@@ -20,6 +21,29 @@ allprojects {
 
     dependencies {
         implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+        api "org.ow2.asm:asm:$asm"
+        api "org.ow2.asm:asm-commons:$asm"
+        api "org.ow2.asm:asm-util:$asm"
+    }
+
+    sourceSets {
+        main.kotlin.srcDirs = ['src/main/kotlin']
+        main.resources.srcDirs = ['src/main/resources']
+    }
+
+    idea {
+        module {
+            inheritOutputDirs = false
+            outputDir = file("${project.buildDir}/classes/kotlin/main")
+            testOutputDir = file("${project.buildDir}/classes/kotlin/test")
+        }
+    }
+
+    compileKotlin {
+        kotlinOptions.jvmTarget = "14"
+    }
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = "14"
     }
 }
 
