@@ -18,6 +18,7 @@
 
 package org.spectral.asm.core
 
+import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.ASM9
 import org.spectral.asm.core.code.Code
@@ -52,6 +53,11 @@ class Method(
     override fun visitMaxs(maxStack: Int, maxLocals: Int) {
         code.maxStack = maxStack
         code.maxLocals = maxLocals
+    }
+
+    override fun visitLabel(label: Label) {
+        val i = code.findLabel(label)
+        code.addInsn(i)
     }
 
     override fun visitEnd() {

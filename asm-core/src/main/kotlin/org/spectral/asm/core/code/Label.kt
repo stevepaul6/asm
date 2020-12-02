@@ -19,49 +19,20 @@
 package org.spectral.asm.core.code
 
 import org.objectweb.asm.MethodVisitor
-import org.objectweb.asm.util.Printer
+import org.objectweb.asm.Label as AsmLabel
 
-/**
- * Represents a JVM opcode instruction./
- *
- * @property opcode Int
- * @property index Int
- * @constructor
- */
-abstract class Instruction(val opcode: Int) {
+class Label(val label: AsmLabel) : Instruction(-1) {
 
     /**
-     * The code this instruction belongs in.
+     * The id of the label
      */
-    lateinit var code: Code
+    var id: Int = 0
 
-    /**
-     * The instruction index
-     */
-    var index: Int = -1
-
-    /**
-     * The next instruction
-     */
-    lateinit var nextInsn: Instruction
-
-    /**
-     * The previous instruction
-     */
-    lateinit var prevInsn: Instruction
-
-    /**
-     * Makes a provided visitor visit this instruction.
-     *
-     * @param visitor MethodVisitor
-     */
-    abstract fun accept(visitor: MethodVisitor)
+    override fun accept(visitor: MethodVisitor) {
+        visitor.visitLabel(label)
+    }
 
     override fun toString(): String {
-        return if(opcode == -1) {
-            "INSN"
-        } else {
-            Printer.OPCODES[opcode]
-        }
+        return "LABEL$id"
     }
 }
