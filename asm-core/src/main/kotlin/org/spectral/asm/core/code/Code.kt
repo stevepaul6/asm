@@ -24,10 +24,19 @@ import org.objectweb.asm.Label as AsmLabel
 
 class Code(val method: Method) {
 
+    /**
+     * The max number of values in the stack for this code instruction sequence
+     */
     var maxStack: Int = -1
 
+    /**
+     * The max number of local variables in the LVT for this code instruction sequence
+     */
     var maxLocals: Int = -1
 
+    /**
+     * Backing storage of ASM labels to label instruction objects
+     */
     private val labelMap = mutableMapOf<AsmLabel, Label>()
 
     /**
@@ -69,14 +78,14 @@ class Code(val method: Method) {
         l.id = labelMap.size
 
         /*
-         * Add the created label to the label map
-         */
-        labelMap[label] = l
-
-        /*
          * Update the code reference of the label.
          */
         l.code = this
+
+        /*
+         * Add the created label to the label map
+         */
+        labelMap[label] = l
 
         return l
     }

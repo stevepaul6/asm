@@ -37,7 +37,7 @@ class Method(
     val owner: Class,
     var access: Int,
     var name: String,
-    var desc: Descriptor
+    var desc: Signature
 ) : MethodVisitor(ASM9) {
 
     /**
