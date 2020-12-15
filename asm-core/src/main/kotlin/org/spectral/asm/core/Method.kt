@@ -22,10 +22,7 @@ import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.ASM9
 import org.spectral.asm.core.code.Code
 import org.spectral.asm.core.code.Instruction
-import org.spectral.asm.core.code.insn.FieldInstruction
-import org.spectral.asm.core.code.insn.IncInstruction
-import org.spectral.asm.core.code.insn.IntInstruction
-import org.spectral.asm.core.code.insn.JumpInstruction
+import org.spectral.asm.core.code.insn.*
 import org.objectweb.asm.Label as AsmLabel
 
 /**
@@ -93,6 +90,10 @@ class Method(
 
     override fun visitJumpInsn(opcode: Int, label: AsmLabel) {
         this.code.addInsn(JumpInstruction(opcode, this.code.findLabel(label)))
+    }
+
+    override fun visitLdcInsn(value: Any) {
+        this.code.addInsn(LdcInstruction(value))
     }
 
     override fun visitEnd() {
