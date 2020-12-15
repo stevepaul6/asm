@@ -101,6 +101,13 @@ class Method(
         label.line = line
     }
 
+    override fun visitLookupSwitchInsn(defaultHandler: AsmLabel, keys: IntArray, labels: Array<AsmLabel>) {
+        val defaultHandlerLabel = this.code.findLabel(defaultHandler)
+        val discoveredLabels = labels.map { this.code.findLabel(it) }
+
+        this.code.addInsn(LookupSwitchInstruction(defaultHandlerLabel, keys, discoveredLabels))
+    }
+
     override fun visitMethodInsn(
             opcode: Int,
             owner: String,
