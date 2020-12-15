@@ -27,7 +27,7 @@ import java.lang.StringBuilder
  * @property arguments MutableList<Type>
  * @property returnType Type
  */
-class Signature {
+class MethodDescriptor {
 
     /**
      * The arguments of the method
@@ -40,7 +40,7 @@ class Signature {
     var returnType: Type
 
     /**
-     * Create a [Signature] with specified arguments and return types
+     * Create a [MethodDescriptor] with specified arguments and return types
      *
      * @param arguments MutableList<Type>
      * @param returnType Type
@@ -52,7 +52,7 @@ class Signature {
     }
 
     /**
-     * Create a [Signature] from a descriptor ASM string.
+     * Create a [MethodDescriptor] from a descriptor ASM string.
      *
      * @param string String
      * @constructor
@@ -63,13 +63,13 @@ class Signature {
     }
 
     /**
-     * Create a [Signature] from a provided [Signature] object.
+     * Create a [MethodDescriptor] from a provided [MethodDescriptor] object.
      *
      * @param other Signature
      * @constructor
      */
-    constructor(other: Signature) {
-        mutableListOf<Type>().apply { this.addAll(other.arguments) }.let { this@Signature.arguments = it }
+    constructor(other: MethodDescriptor) {
+        mutableListOf<Type>().apply { this.addAll(other.arguments) }.let { this@MethodDescriptor.arguments = it }
         this.returnType = other.returnType
     }
 
