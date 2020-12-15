@@ -58,6 +58,14 @@ class Class(val pool: ClassPool) : ClassVisitor(ASM9) {
 
     val isFinal: Boolean get() = (this.access and ACC_FINAL) != 0
 
+    fun findField(name: String): Field? {
+        return this.fields[this.name + "." + this.name]
+    }
+
+    fun findMethod(name: String, desc: String): Method? {
+        return this.methods[this.name + "." + name + desc]
+    }
+
     override fun visit(
         version: Int,
         access: Int,

@@ -28,12 +28,12 @@ import org.objectweb.asm.util.Printer
  * @property index Int
  * @constructor
  */
-abstract class Instruction(val opcode: Int) {
+open class Instruction(val opcode: Int) {
 
     /**
      * The code this instruction belongs in.
      */
-    lateinit var code: Code
+    lateinit var code: Code internal set
 
     /**
      * The instruction index
@@ -41,25 +41,43 @@ abstract class Instruction(val opcode: Int) {
     var index: Int = -1
 
     /**
-     * The next instruction
+     * Gets the previous instruction in the code block.
      */
-    lateinit var nextInsn: Instruction
+    val prevInsn: Instruction? get() {
+        return when(index) {
+            0 -> null
+            else -> this.code.instructions[index - 1]
+        }
+    }
 
     /**
-     * The previous instruction
+     * Gets the next instruction in the code block.
      */
-    lateinit var prevInsn: Instruction
+    val nextInsn: Instruction? get() {
+        return if(index == code.size) {
+            null
+        } else {
+            this.code.instructions[index + 1]
+        }
+    }
 
     /**
      * Makes a provided visitor visit this instruction.
      *
      * @param visitor MethodVisitor
      */
-    abstract fun accept(visitor: MethodVisitor)
+    open fun accept(visitor: MethodVisitor) {
+        visitor.visitInsn(this.opcode)
+    }
 
+    /**
+     * Gets the string representation of the instruction object.
+     *
+     * @return String
+     */
     override fun toString(): String {
         return if(opcode == -1) {
-            "INSN"
+            "UNKNOWN"
         } else {
             Printer.OPCODES[opcode]
         }

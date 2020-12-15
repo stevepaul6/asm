@@ -22,6 +22,8 @@ import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.ASM9
 import org.spectral.asm.core.code.Code
+import org.spectral.asm.core.code.Instruction
+import org.spectral.asm.core.code.insn.FieldInstruction
 
 /**
  * Represents a method which is owned by a JVM class.
@@ -50,14 +52,32 @@ class Method(
      */
     val code = Code(this)
 
+    /*
+     * Visitor Methods
+     */
+
     override fun visitMaxs(maxStack: Int, maxLocals: Int) {
         code.maxStack = maxStack
         code.maxLocals = maxLocals
     }
 
+    override fun visitCode() {
+        /*
+         * Nothing to do.
+         */
+    }
+
     override fun visitLabel(label: Label) {
         val i = code.findLabel(label)
         code.addInsn(i)
+    }
+
+    override fun visitInsn(opcode: Int) {
+        this.code.addInsn(Instruction(opcode))
+    }
+
+    override fun visitFieldInsn(opcode: Int, owner: String, name: String, desc: String) {
+        this.code.addInsn(FieldInstruction(opcode, owner, name, desc))
     }
 
     override fun visitEnd() {
