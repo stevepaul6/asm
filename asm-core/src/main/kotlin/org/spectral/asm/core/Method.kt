@@ -101,6 +101,10 @@ class Method(
         label.line = line
     }
 
+    override fun visitVarInsn(opcode: Int, varIndex: Int) {
+        this.code.addInsn(LVTInstruction(opcode, varIndex))
+    }
+
     override fun visitEnd() {
         /*
          * Add this method to the owner's method list.
