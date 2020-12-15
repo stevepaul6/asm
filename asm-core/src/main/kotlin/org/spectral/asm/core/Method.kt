@@ -18,7 +18,6 @@
 
 package org.spectral.asm.core
 
-import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.ASM9
 import org.spectral.asm.core.code.Code
@@ -26,6 +25,8 @@ import org.spectral.asm.core.code.Instruction
 import org.spectral.asm.core.code.insn.FieldInstruction
 import org.spectral.asm.core.code.insn.IncInstruction
 import org.spectral.asm.core.code.insn.IntInstruction
+import org.spectral.asm.core.code.insn.JumpInstruction
+import org.objectweb.asm.Label as AsmLabel
 
 /**
  * Represents a method which is owned by a JVM class.
@@ -69,7 +70,7 @@ class Method(
          */
     }
 
-    override fun visitLabel(label: Label) {
+    override fun visitLabel(label: AsmLabel) {
         val i = code.findLabel(label)
         code.addInsn(i)
     }
@@ -90,7 +91,9 @@ class Method(
         this.code.addInsn(IntInstruction(opcode, operand))
     }
 
-    
+    override fun visitJumpInsn(opcode: Int, label: AsmLabel) {
+        this.code.addInsn(JumpInstruction(opcode, this.code.findLabel(label)))
+    }
 
     override fun visitEnd() {
         /*

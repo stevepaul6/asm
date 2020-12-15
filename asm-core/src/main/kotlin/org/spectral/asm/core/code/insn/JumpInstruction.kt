@@ -21,32 +21,20 @@ package org.spectral.asm.core.code.insn
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.util.Printer
 import org.spectral.asm.core.code.Instruction
+import org.spectral.asm.core.code.Label
 
 /**
- * Represents an int instruction JVM type.
- *
- * @property opcode Int
- * @property operand Int
+ * Represents a JVM jumping instruction to a label.
+ * @property label Label
  * @constructor
  */
-class IntInstruction(opcode: Int, val operand: Int): Instruction(opcode) {
+class JumpInstruction(opcode: Int, val label: Label) : Instruction(opcode) {
 
-    /**
-     * Makes a provided method visitor visit this object.
-     *
-     * @param visitor MethodVisitor
-     */
     override fun accept(visitor: MethodVisitor) {
-        visitor.visitIntInsn(opcode, operand)
+        visitor.visitJumpInsn(opcode, label.label)
     }
 
-    /**
-     * The string representation of this object.
-     *
-     * @return String
-     */
     override fun toString(): String {
-        return "${Printer.OPCODES[opcode]}[operand=$operand]"
+        return "${Printer.OPCODES[opcode]}[label=$label]"
     }
-
 }
