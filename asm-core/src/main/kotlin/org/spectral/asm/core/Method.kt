@@ -101,6 +101,16 @@ class Method(
         label.line = line
     }
 
+    override fun visitMethodInsn(
+            opcode: Int,
+            owner: String,
+            name: String,
+            desc: String,
+            isInterface: Boolean
+    ) {
+        this.code.addInsn(MethodInstruction(opcode, owner, name, desc, isInterface))
+    }
+
     override fun visitVarInsn(opcode: Int, varIndex: Int) {
         this.code.addInsn(LVTInstruction(opcode, varIndex))
     }
