@@ -28,6 +28,11 @@ class Label(val label: AsmLabel) : Instruction(-1) {
      */
     var id: Int = 0
 
+    /**
+     * The line which this label is located at.
+     */
+    var line: Int = -1
+
     override fun accept(visitor: MethodVisitor) {
         visitor.visitLabel(label)
     }

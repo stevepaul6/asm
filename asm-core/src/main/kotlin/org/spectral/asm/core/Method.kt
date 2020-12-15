@@ -96,6 +96,11 @@ class Method(
         this.code.addInsn(LdcInstruction(value))
     }
 
+    override fun visitLineNumber(line: Int, start: AsmLabel) {
+        val label = this.code.findLabel(start)
+        label.line = line
+    }
+
     override fun visitEnd() {
         /*
          * Add this method to the owner's method list.
