@@ -18,6 +18,7 @@
 
 package org.spectral.asm.core
 
+import org.objectweb.asm.Handle
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.ASM9
 import org.spectral.asm.core.code.Code
@@ -78,6 +79,10 @@ class Method(
 
     override fun visitFieldInsn(opcode: Int, owner: String, name: String, desc: String) {
         this.code.addInsn(FieldInstruction(opcode, owner, name, desc))
+    }
+
+    override fun visitInvokeDynamicInsn(name: String, desc: String, bootstrapMethodHandle: Handle, vararg bootstrapMethodArguments: Any?) {
+        this.code.addInsn(InvokeDynamicInstruction(name, desc, bootstrapMethodHandle, bootstrapMethodArguments.toList()))
     }
 
     override fun visitIincInsn(varIndex: Int, inc: Int) {
