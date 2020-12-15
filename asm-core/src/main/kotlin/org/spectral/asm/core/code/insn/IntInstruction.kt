@@ -19,23 +19,19 @@
 package org.spectral.asm.core.code.insn
 
 import org.objectweb.asm.MethodVisitor
-import org.objectweb.asm.Opcodes
 import org.spectral.asm.core.code.Instruction
 
 /**
- * Represent a IINC jvm instruction.
- *
- * @property varIndex The variable index on the LVT to increment.
- * @property inc The ammount to increment by
- * @constructor
+ * Represents an int instruction JVM type.
  */
-class IncInstruction(val varIndex: Int, val inc: Int) : Instruction(opcode = Opcodes.IINC) {
+class IntInstruction(opcode: Int, val operand: Int): Instruction(opcode) {
 
     override fun accept(visitor: MethodVisitor) {
-        visitor.visitIincInsn(varIndex, inc)
+        visitor.visitIntInsn(opcode, operand)
     }
 
     override fun toString(): String {
-        return "IINC[varIndex=$varIndex, inc=$inc]"
+        return "INT[operand=$operand]"
     }
+
 }

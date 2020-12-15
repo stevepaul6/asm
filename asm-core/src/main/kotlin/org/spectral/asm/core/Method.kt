@@ -24,6 +24,8 @@ import org.objectweb.asm.Opcodes.ASM9
 import org.spectral.asm.core.code.Code
 import org.spectral.asm.core.code.Instruction
 import org.spectral.asm.core.code.insn.FieldInstruction
+import org.spectral.asm.core.code.insn.IncInstruction
+import org.spectral.asm.core.code.insn.IntInstruction
 
 /**
  * Represents a method which is owned by a JVM class.
@@ -79,6 +81,16 @@ class Method(
     override fun visitFieldInsn(opcode: Int, owner: String, name: String, desc: String) {
         this.code.addInsn(FieldInstruction(opcode, owner, name, desc))
     }
+
+    override fun visitIincInsn(varIndex: Int, inc: Int) {
+        this.code.addInsn(IncInstruction(varIndex, inc))
+    }
+
+    override fun visitIntInsn(opcode: Int, operand: Int) {
+        this.code.addInsn(IntInstruction(opcode, operand))
+    }
+
+    
 
     override fun visitEnd() {
         /*
